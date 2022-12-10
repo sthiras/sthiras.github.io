@@ -1,0 +1,15 @@
+body, .body{
+    overflow: hidden;
+}
+.home-title, .home-message{
+    display: none;
+}
+.home-projects{
+    font-size: var(--h3-font-size);
+}
+.home-projects .select-heading{
+    display: none;
+}
+.home-projects .seemore{
+    display: block;
+}
