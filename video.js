@@ -1,38 +1,61 @@
-let playingBlock = -1;
+Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
+  get: function () {
+      return !!(this.currentTime > 0 && !this.paused && !this.ended && this.readyState > 2);
+  }
+});
 
-window.addEventListener('load', videoScroll);
-window.addEventListener('resize', videoScroll);
-window.addEventListener('scroll', videoScroll);
+document.addEventListener('DOMContentLoaded', function(){
+    if(document.querySelectorAll('[autoplay]').length > 0){
+      window.addEventListener('click', videoAutoplay);
+      window.addEventListener('touchstart', videoAutoplay);
+    }
+    if(document.getElementsByClassName("video-grid").length > 0){
+      videoScroll();
+      window.addEventListener('resize', videoScroll);
+      window.addEventListener('scroll', videoScroll);
+    }
+});
+
+function videoAutoplay() {
+  const videoElm = document.querySelectorAll('[autoplay]');
+  for (let i = 0; i < videoElm.length; i++) {
+    if (videoElm[i].playing) {
+        // video is already playing so do nothing
+    }
+    else {
+        // video is not playing
+        // so play video now
+        videoElm[i].play();
+        videoElm[i].removeAttribute('autoplay');
+    }
+  }
+}
 
 function videoScroll() {
+      let windowHeight = window.innerHeight;
+      const videoBlock = document.getElementsByClassName("video-grid");
+      for (let i = 0; i < videoBlock.length; i++) {
+  
+          let thisVideoBlock = videoBlock[i],
+              videoBlockTop = thisVideoBlock.getBoundingClientRect().top,
+              videoBlockBottom = thisVideoBlock.getBoundingClientRect().bottom;
+              videoElm = thisVideoBlock.getElementsByTagName("video");
 
-    if ( document.getElementsByClassName("video-grid").length > 0) {
-        let windowHeight = window.innerHeight;
-        const videoBlock = document.getElementsByClassName("video-grid");
-        for (let i = 0; i < videoBlock.length; i++) {
-    
-            let thisVideoBlock = videoBlock[i],
-                videoBlockTop = thisVideoBlock.getBoundingClientRect().top,
-                videoBlockBottom = thisVideoBlock.getBoundingClientRect().bottom;
-                videoElm = thisVideoBlock.getElementsByTagName("video");
-
-            if (videoBlockTop <= (windowHeight/2) && videoBlockBottom >= (windowHeight/2)) {
-                if(playingBlock != i){
-                  for (let j = 0; j < videoElm.length; j++){
-                    videoElm[j].play();
-                  }
-                  //console.log("play" + i);
-                  playingBlock = i;
+          if (videoBlockTop <= (windowHeight/2) && videoBlockBottom >= (windowHeight/2)) {
+              for (let j = 0; j < videoElm.length; j++){
+                if(!videoElm[j].playing){
+                  videoElm[j].play();
                 }
-            } else if(playingBlock == i) {
-                for (let j = 0; j < videoElm.length; j++){
+              }
+                //console.log("play" + i);
+          } else {
+              for (let j = 0; j < videoElm.length; j++){
+                if(videoElm[j].playing){
                   videoElm[j].pause();
                 }
-                //console.log("pause" + i);
-                playingBlock = -1;
-            }
-    
-        }
-    }
+              }
+              //console.log("pause" + i);
+          }
   
+      }
   }
